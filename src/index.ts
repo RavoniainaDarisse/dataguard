@@ -5,6 +5,7 @@ import {
 } from "./utils/logger.js";
 
 import { validateEmail } from "./validators/dataValidator.js";
+import { isValidUserId, isValidUserName } from "./validators/userValidator.js";
 const receivedData = [
     {
         id: 1,
@@ -13,39 +14,34 @@ const receivedData = [
     },
     {
         id: 2,
-        name: "Test",
+        name: "Heriniaina",
         email: ""
     },
     {
         id: 3,
-        name: "Invalid",
-        email: "invalid-email"
+        name: "randrianirina",
+        email: "rendrianairinagmail.com"
     },
     {
         id: 4,
-        name: "WrongType",
-        email: 123
-    },
-    {
-        id: 5,
-        name: "NullValue",
-        email: null
-    },
-    {
-        id: 6,
-        name: "UndefinedValue",
-        email: undefined
-    },
-    {
-        id: 7,
-        name: "BooleanValue",
-        email: true
+        name: "",
+        email : "rado@gmail.com"
     }
 ];
 
 console.table(receivedData)
 
 for (const data of receivedData){
+    if(!isValidUserId(data.id)){
+        logError(`User invalide : id incorrect`);
+        continue;
+    }
+
+    if(!isValidUserName(data.name)){
+        logError(`User ${data.id} : nom invalide`);
+        continue;
+    }
+
     const result =  validateEmail(data.email);
 
     if(!result.valid){
