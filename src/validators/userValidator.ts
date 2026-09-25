@@ -5,3 +5,4 @@ export function isValidUserId(value: unknown): boolean {
 export function isValidUserName(value: unknown): boolean {
     return typeof value === "string" && value.length > 0;
 }
+

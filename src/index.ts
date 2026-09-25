@@ -1,26 +1,23 @@
+
+import type { User } from "./types/user.js";
+
 import {
     logInfo,
-    logWarning,
     logError
 } from "./utils/logger.js";
 
-import { validateEmail } from "./validators/dataValidator.js";
-import { isValidUserId, isValidUserName } from "./validators/userValidator.js";
-const receivedData :{
-    id : number,
-    name : string,
-    email :string,
-    phone? : string,
-    metadata :{
-        source : string,
-        createdAt : string
-    }
-}[] = [
+import { validateUser } from "./services/userValidationService.js";
+
+
+/**
+ * Données reçues depuis une source externe.
+ */
+const receivedData: User[] = [
     {
         id: 1,
         name: "Ravoniaina",
         email: "user1@example.com",
-        phone : "0341209922",
+        phone: "0341209922",
         metadata: {
             source: "api",
             createdAt: "2026-09-23"
@@ -28,66 +25,8 @@ const receivedData :{
     },
     {
         id: 3,
-        name: "randrianirina",
+        name: "",
         email: "rendrianairinagmail.com",
-        // phone : "023129000",
-        metadata: {
-            source: "api",
-            createdAt: "2026-09-23"
-        }
-    }
-];
-
-console.table(receivedData)
-
-for (const data of receivedData){
-    if(!isValidUserId(data.id)){
-        logError(`User invalide : id incorrect`);
-        continue;
-    }
-
-    if(!isValidUserName(data.name)){
-        logError(`User ${data.id} : nom invalide`);
-        continue;
-    }
-
-    const result =  validateEmail(data.email);
-
-    if(!result.valid){
-        logError(`User ${data.id} : ${result.reason}`)
-        continue;
-    }
-
-    logInfo(`User ${data.id} : donne valide`)
-
-}
-
-
-const users : {
-    id:number,
-    name : string,
-    email : string,
-    phone? : string,
-    metadata:{
-        source : string,
-        createdAt : string
-    }
-}[] =[
-    {
-        id: 1,
-        name: "Heritiana",
-        email: "user3@example.com",
-        phone : "0341209922",
-        metadata: {
-            source: "api",
-            createdAt: "2026-09-23"
-        }
-    },
-    {
-        id: 3,
-        name: "Niaina",
-        email: "rendrianairinagmail.com",
-        phone : "",
         metadata: {
             source: "api",
             createdAt: "2026-09-23"
@@ -95,32 +34,33 @@ const users : {
     },
     {
         id: 4,
-        name: "Dairsse",
-        email: "",
-        phone : "0293023093",
+        name: "  Jean  ",
+        email: "jean@example.com",
+        phone: "12345",
         metadata: {
             source: "api",
-            createdAt: "2026-09-24"
+            createdAt: "2026-09-23"
         }
     }
-]
+];
 
-const FilterUserEmail = users.filter(user =>{
-    return user.email
-})
-console.log(FilterUserEmail)
 
-const MapNameUserEmail = FilterUserEmail.map(user =>{
-    return user.name
-})
-console.log(MapNameUserEmail)
+/**
+ * Validation des données reçues.
+ */
+console.log("=== VALIDATION DES DONNÉES ===");
 
-const NbrUserEmail = FilterUserEmail.reduce((count, user)=>{
-        return user.email ? count + 1 :  count 
-},0)
-console.log(NbrUserEmail)
+for (const user of receivedData) {
+    const result = validateUser(user);
 
-const FindUser = users.find(user=>{
-    return user.id === 3
-})
-console.log(FindUser)
+    if (result.valid) {
+        logInfo(`User ${result.data.id} : donnée valide`);
+        console.table(result.data);
+    } else {
+        logError(`User ${user.id} : données invalides`);
+    
+        for (const error of result.errors) {
+            logError(`  - ${error}`);
+        }
+    }
+}
